@@ -59,7 +59,6 @@ void execute_opcode(uint16_t opcode) {
             for (int i = 0; i < WIDTH * HEIGHT; i++) {
                 screen[i] = 0; // Clear screen
             }
-            printf("Screen Cleared!\n");
             break;
         default:
             printf("Unknown opcode: 0x%X\n", opcode);
@@ -112,11 +111,12 @@ void update_timers() {
     }
 }
 
-// Dino game loop
+// Dino game loop with countdown
 void run_dino_game() {
     struct termios oldt, newt;
     int ch;
     int pos = 0;
+    int countdown = 15;  // 15-second countdown
     
     // Set non-blocking input
     tcgetattr(0, &oldt);
@@ -125,11 +125,24 @@ void run_dino_game() {
     tcsetattr(0, TCSANOW, &newt);
     fcntl(0, F_SETFL, O_NONBLOCK);
     
-    printf("\nPress 'c' to exit Dino game\n");
-    
-    while (1) {
+    while (countdown > 0) {
         system("clear");  // clear screen
         
+        // Display introduction and countdown timer
+        if (countdown == 15) {
+            printf("=== Xenox Chip-8 Emulator ===\n");
+            printf("Xenox is a Chip-8 virtual machine emulator. It supports standard Chip-8 opcodes and allows you to run Chip-8 programs.\n");
+            printf("Press 'c' to exit the Dino game at any time.\n");
+            printf("\nPress any key to begin the Dino game...\n");
+            getchar();
+            sleep (5); // Wait for user input before continuing
+            system("clear");
+        }
+
+        // Display the countdown timer
+        printf("Time Left: %d seconds\n\n", countdown);
+        
+        // Display Dino
         for (int i = 0; i < pos; i++) printf(" ");
         printf("  __\n");
         for (int i = 0; i < pos; i++) printf(" ");
@@ -143,19 +156,21 @@ void run_dino_game() {
         if (ch == 'c' || ch == 'C') break;
         
         pos = (pos + 1) % (WIDTH - 10);
-        
-        usleep(150000);  // slow down animation
+
+        usleep(15000);  // slow down animation
+
+        // Countdown
+        countdown--;
+        sleep(1);
     }
-    
+
     // Restore terminal settings
     tcsetattr(0, TCSANOW, &oldt);
-    
-    printf("\nMade by Wisdom - Emulation Ended\n");
+
+    printf("\nGame Over or Exited - Emulation Ended\n");
 }
 
 int main(int argc, char** argv) {
-    printf("=== Xenox Chip-8 Emulator ===\n");
-
     // Load fontset
     load_fontset();
 
@@ -182,10 +197,9 @@ int main(int argc, char** argv) {
 
     printf("PC now at: 0x%X\n", PC);
     printf("=== Emulation Finished ===\n");
-    
+
     // Run Dino game after emulation
     run_dino_game();
 
     return 0;
 }
-
