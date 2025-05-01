@@ -4,4 +4,4 @@ Beyond basic emulation, Xenox integrates a built-in Dino runner game (inspired b
 
 The emulator is designed with future improvements in mind, such as integration with SDL/OpenGL for graphics rendering and the ability to load external ROMs for flexible testing and usage.
 
-<img width="352" alt="Screenshot 2025-05-01 at 11 31 24" src="https://github.com/user-attachments/assets/02ef95dc-77e1-49dd-a9d6-acefd7741039" />
+<img width="341" alt="Screenshot 2025-05-01 at 11 37 15" src="https://github.com/user-attachments/assets/578f7dc9-d58e-430e-a30a-05f1fb2779f1" />
