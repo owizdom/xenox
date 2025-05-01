@@ -1,5 +1,10 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <unistd.h>     // for sleep
+#include <termios.h>    // for terminal settings
+#include <fcntl.h>      // for non-blocking input
+#include <string.h>
+#include <stdlib.h> 
 
 #define WIDTH 64
 #define HEIGHT 32
@@ -62,8 +67,6 @@ void execute_opcode(uint16_t opcode) {
     }
 }
 
-// 🟢 Planned Improvements — placeholders
-
 // Initialize display (SDL/OpenGL stub)
 void initialize_display() {
     printf("[TODO] Initialize graphics (SDL/OpenGL)\n");
@@ -109,6 +112,47 @@ void update_timers() {
     }
 }
 
+// Dino game loop
+void run_dino_game() {
+    struct termios oldt, newt;
+    int ch;
+    int pos = 0;
+    
+    // Set non-blocking input
+    tcgetattr(0, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(0, TCSANOW, &newt);
+    fcntl(0, F_SETFL, O_NONBLOCK);
+    
+    printf("\nPress 'c' to exit Dino game\n");
+    
+    while (1) {
+        system("clear");  // clear screen
+        
+        for (int i = 0; i < pos; i++) printf(" ");
+        printf("  __\n");
+        for (int i = 0; i < pos; i++) printf(" ");
+        printf(" /o_)\n");
+        for (int i = 0; i < pos; i++) printf(" ");
+        printf("/   \\\n");
+        
+        printf("\n----------------------------------------------\n");
+        
+        ch = getchar();
+        if (ch == 'c' || ch == 'C') break;
+        
+        pos = (pos + 1) % (WIDTH - 10);
+        
+        usleep(150000);  // slow down animation
+    }
+    
+    // Restore terminal settings
+    tcsetattr(0, TCSANOW, &oldt);
+    
+    printf("\nMade by Wisdom - Emulation Ended\n");
+}
+
 int main(int argc, char** argv) {
     printf("=== Xenox Chip-8 Emulator ===\n");
 
@@ -127,8 +171,8 @@ int main(int argc, char** argv) {
     // Initialize display (placeholder)
     initialize_display();
 
-    // Main emulation loop (simplified)
-    for (int cycles = 0; cycles < 10; cycles++) { // test loop
+    // Original emulation loop
+    for (int cycles = 0; cycles < 10; cycles++) {
         uint16_t opcode = fetch_opcode();
         execute_opcode(opcode);
         update_timers();
@@ -138,6 +182,10 @@ int main(int argc, char** argv) {
 
     printf("PC now at: 0x%X\n", PC);
     printf("=== Emulation Finished ===\n");
+    
+    // Run Dino game after emulation
+    run_dino_game();
 
     return 0;
 }
+
